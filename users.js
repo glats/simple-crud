@@ -1,31 +1,22 @@
-var mongo = require('mongodb');
+var mongodb = require('mongodb'),
+    MongoClient = mongodb.MongoClient,
+    mongoUrl = 'mongodb://127.0.0.1:27017/userdb',
+    ObjectID = mongodb.ObjectID,
+    db;
 
-var Server = mongo.Server,
-    Db = mongo.Db,
-    BSON = mongo.BSONPure;
-
-var server = new Server('localhost', 27017, {auto_reconnect: true});
-db = new Db('userdb', server);
-
-db.open(function(err, db) {
-    if(!err) {
-        console.log("Connected to 'userdb' database");
-        db.collection('users', {strict:true}, function(err, collection) {
-            if (err) {
-                console.log("The 'users' collection doesn't exist. Creating it with sample data...");
-                populateDB();
-            }
-        });
-    }
-});
+exports.connect = function(callback) {
+  MongoClient.connect(mongoUrl, function(err, database) {
+    if( err ) throw err;
+    db = database;
+    callback();
+  });
+}
 
 exports.findById = function(req, res) {
     var id = req.params.id;
     console.log('Retrieving user: ' + id);
-    db.collection('users', function(err, collection) {
-        collection.findOne({'_id':new BSON.ObjectID(id)}, function(err, item) {
-            res.send(item);
-        });
+    db.collection('users').findOne({'_id':new ObjectID(id)}, function(err, item) {
+       res.send(item);
     });
 };
 
@@ -45,8 +36,8 @@ exports.addUser = function(req, res) {
             if (err) {
                 res.send({'error':'An error has occurred'});
             } else {
-                console.log('Success: ' + JSON.stringify(result[0]));
-                res.send(result[0]);
+                console.log('Success: ' + JSON.stringify(result.ops[0]));
+                res.send(result.ops[0]);
             }
         });
     });
@@ -58,7 +49,7 @@ exports.updateUser = function(req, res) {
     console.log('Updating user: ' + id);
     console.log(JSON.stringify(user));
     db.collection('users', function(err, collection) {
-        collection.update({'_id':new BSON.ObjectID(id)}, user, {safe:true}, function(err, result) {
+        collection.update({'_id':new ObjectID(id)}, user, {safe:true}, function(err, result) {
             if (err) {
                 console.log('Error updating user: ' + err);
                 res.send({'error':'An error has occurred'});
@@ -74,7 +65,7 @@ exports.deleteUser = function(req, res) {
     var id = req.params.id;
     console.log('Deleting user: ' + id);
     db.collection('users', function(err, collection) {
-        collection.remove({'_id':new BSON.ObjectID(id)}, {safe:true}, function(err, result) {
+        collection.remove({'_id':new ObjectID(id)}, {safe:true}, function(err, result) {
             if (err) {
                 res.send({'error':'An error has occurred - ' + err});
             } else {
