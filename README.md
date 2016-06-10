@@ -10,3 +10,5 @@ $ npm install
 ```
 $ node server.js
 ```
+#Is working now?
+Check it: http://localhost:9000/users
