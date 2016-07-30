@@ -19,6 +19,6 @@ user.connect(function() {
    app.post('/users', user.addUser);
    app.put('/users/:id', user.updateUser);
    app.delete('/users/:id', user.deleteUser);
-   app.listen(9000);
-   console.log('Listening on port 9000...');
+   app.listen(8081);
+   console.log('Listening on port 8081...');
 });
