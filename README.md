@@ -17,7 +17,7 @@ $ npm install
 ```
 # Run
 ```
-$ node server.js
+$ npm start 
 ```
 # It's working now?
 Check it: [http://localhost:9000/users](http://localhost:9000/users)
